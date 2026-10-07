@@ -1,0 +1,9 @@
+venv/
+__pycache__/
+*.pyc
+
+certgen.db
+certificates/
+
+.pytest_cache/
+.vscode/
