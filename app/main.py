@@ -4,7 +4,6 @@ import re
 import zipfile
 from contextlib import asynccontextmanager
 from typing import Any
-
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, ConfigDict, Field
@@ -22,12 +21,28 @@ async def lifespan(app):
 
 
 app = FastAPI(title="Bulk Certificate Generator", lifespan=lifespan)
+from fastapi.responses import RedirectResponse
+
+
+@app.get("/", include_in_schema=False)
+def root():
+    return RedirectResponse("/docs")
 
 
 class JobRequest(BaseModel):
-    model_config = ConfigDict(str_strip_whitespace=True)
+    model_config = ConfigDict(
+        str_strip_whitespace=True,
+        json_schema_extra={
+            "example": {
+                "event_name": "Python Bootcamp 2026",
+                "recipients": [
+                    {"name": "Amit Sharma", "email": "amit@example.com"},
+                    {"name": "Priya Singh", "email": "priya@example.com"},
+                ],
+            }
+        },
+    )
     event_name: str = Field(min_length=1, max_length=200)
-    # list[Any]: a bad recipient must not reject the whole request
     recipients: list[Any] = Field(min_length=1, max_length=MAX_RECIPIENTS)
 
 
